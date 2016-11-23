@@ -19,21 +19,21 @@ namespace IVR.prompts
         {
             this.prompt_list = prompt_list_;
             player = new SoundPlayer();
-            thread = new Thread(Play); 
-            
+            thread = new Thread(PlayList);
+
         }
 
         public PromptPlayer(Prompt prompt_)
         {
             this.prompt_list.Add(prompt_);
             player = new SoundPlayer();
-            thread = new Thread(Play);
+            thread = new Thread(PlayList);
         }
 
         public PromptPlayer()
         {
             player = new SoundPlayer();
-            thread = new Thread(Play);
+            thread = new Thread(PlayList);
         }
 
         public void SetPrompt(Prompt prompt_)
@@ -46,18 +46,18 @@ namespace IVR.prompts
             this.prompt_list = prompts_;
         }
 
-        public void Play()
-        {          
-            foreach ( Prompt p in prompt_list)
+        public void PlayList()
+        {
+            foreach (Prompt p in prompt_list)
             {
                 player.SoundLocation = p.path;
                 player.Load();
                 player.PlaySync();
-                
-            }           
+
+            }
         }
 
-        public void StaticPlay()
+        private void StaticPlay()
         {
             foreach (Prompt p in prompt_list)
             {
@@ -68,21 +68,34 @@ namespace IVR.prompts
             }
         }
 
+        public void Play()
+        {
+            if (prompt_list.Count() == 1)
+                StaticPlay();
+            else
+                ThreadPlay();
+        }
 
-
-        public void ThreadPlay()
-        {    
+        private void ThreadPlay()
+        {
             thread.Start();
         }
 
-        public void ThreadStop()
+        private void ThreadStop()
         {
             thread.Abort();
         }
-        public void Stop()
+        private void StaticStop()
         {
-
             this.player.Stop();
         }
+        public void Stop()
+        {
+            if (prompt_list.Count() == 1)
+                StaticStop();
+            else
+                ThreadStop();
+        }
+
     }
 }
