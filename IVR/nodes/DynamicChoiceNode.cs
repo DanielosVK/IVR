@@ -13,7 +13,8 @@ namespace IVR.nodes
         private Prompt static_out;
         private bool mode;
         private string message;
-        public DynamicChoiceNode(string nodeName, string message, Call callOwner, bool mode, Prompt static_in, Prompt static_out) : base(nodeName, callOwner)
+        public DynamicChoiceNode(string nodeName, string message, Call callOwner, bool mode, Prompt static_in, Prompt static_out)
+            : base(nodeName, callOwner)
         {
             this.nodeName = nodeName;
             this.callOwner = callOwner;
@@ -23,13 +24,13 @@ namespace IVR.nodes
             this.static_out = static_out;
         }
 
-    
+
 
         protected override void OnEntry()
         {
-            
+
             CreatePrompt();
-            player.Play();    
+            player.Play();
             Console.WriteLine(message);
 
         }
@@ -60,14 +61,34 @@ namespace IVR.nodes
                 p.AddRange(callOwner.GetPizza().GetPrompts());
                 p.Add(static_out);
             }
-            else if (!mode)
+            else if (!mode) //order
             {
-
-                
+                int i = 0;
+                p.Add(static_in); //twoje zamuwienie zawiera
+                foreach (Pizza pitca in callOwner.items)
+                {
+                    p.Add(new Prompt("pizze.wav"));
+                    if (pitca.customCreated)
+                    {
+                        p.Add(new Prompt("ze składnikami.wav"));
+                        p.AddRange(pitca.GetPrompts());
+                        p.Add(new Prompt("o rozmiarze.wav"));
+                        p.AddRange(pitca.size.GetPrompts());
+                    }
+                    else
+                    {
+                        p.AddRange(pitca.GetPrompts());
+                        p.Add(new Prompt("o rozmiarze.wav"));
+                        p.AddRange(pitca.size.GetPrompts());
+                    }
+                    i++;
+                    if (i < callOwner.items.Count())
+                        p.Add(new Prompt("oraz.wav"));
+                }
+                p.Add(static_out);
             }
             else Console.WriteLine("ehh :/");
             player.SetPrompts(p);
         }
     }
 }
-
