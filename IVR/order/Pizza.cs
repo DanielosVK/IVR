@@ -43,6 +43,11 @@ namespace IVR.order
         {
             toppings.Add(topping);
         }
+        
+        public void SetSize(Size size_)
+        {
+            size = size_;
+        }
 
         public string GetName()
         {
